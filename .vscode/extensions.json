@@ -1,0 +1,16 @@
+{
+    "recommendations": [
+        "pixl.bevy-snippets",
+        "streetsidesoftware.code-spell-checker",
+        "serayuzgur.crates",
+        "usernamehw.errorlens",
+        "tamasfe.even-better-toml",
+        "visualstudioexptteam.vscodeintellicode",
+        "christian-kohler.path-intellisense",
+        "jscearcy.rust-doc-viewer",
+        "lorenzopirro.rust-flash-snippets",
+        "rust-lang.rust-analyzer",
+        "tabnine.tabnine-vscode",
+        "gruntfuggly.todo-tree"
+    ]
+}

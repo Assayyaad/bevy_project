@@ -1,0 +1,12 @@
+{
+    "enabled": true,
+    "caseSensitive": true,
+    "language": "en",
+    "files": [
+        "./src/*.rs"
+    ],
+    "words": [
+        "rgb",
+        "Vec"
+    ]
+}

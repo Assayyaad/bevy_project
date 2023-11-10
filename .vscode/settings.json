@@ -1,0 +1,15 @@
+{
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSaveMode": "file",
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "editor.trimAutoWhitespace": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true
+    },
+
+    "files.insertFinalNewline": true,
+    "files.eol": "auto",
+}
