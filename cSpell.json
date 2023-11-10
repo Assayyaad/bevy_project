@@ -6,7 +6,10 @@
         "./src/*.rs"
     ],
     "words": [
+        "len",
         "rgb",
-        "Vec"
+        "vec",
+        "Vec",
+        "xyz"
     ]
 }
