@@ -27,11 +27,7 @@ fn spawn_board(mut commands: Commands) {
                     custom_size: Some(Vec2::ONE * SIZE),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec3::new(
-                    SIZE * i as f32,
-                    SIZE * j as f32,
-                    0.,
-                )),
+                transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), 0.),
                 ..default()
             });
             choice = !choice;
