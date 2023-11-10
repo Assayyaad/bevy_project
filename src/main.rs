@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_vector_shapes::prelude::*;
 // use bevy_mod_picking::*;
 
 // mod pieces;
@@ -21,6 +22,7 @@ fn main() {
         .add_plugins(BoardPlugin)
         // .add_plugins(PiecesPlugin)
         // .add_plugin(UIPlugin)
+        .add_plugins(Shape2dPlugin::default())
         .add_systems(Startup, setup)
         // .add_systems(FixedUpdate, keyboard_input)
         .run();
