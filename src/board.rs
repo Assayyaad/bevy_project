@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 pub const SIZE: f32 = 50.0;
 pub const MAX: u8 = 8;
+const ORDER_LAYER: f32 = 0.0;
 
 #[derive(Bundle)]
 struct BoardBundle {
@@ -27,7 +28,7 @@ fn spawn_board(mut commands: Commands) {
                     custom_size: Some(Vec2::ONE * SIZE),
                     ..default()
                 },
-                transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), 0.),
+                transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), ORDER_LAYER),
                 ..default()
             });
             choice = !choice;

@@ -4,6 +4,8 @@ use bevy_vector_shapes::prelude::*;
 use crate::board::MAX;
 use crate::board::SIZE;
 
+const ORDER_LAYER: f32 = 5.0;
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum PieceColor {
     White,
@@ -80,7 +82,7 @@ fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
             painter.color = Color::PINK;
         }
 
-        let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, 5.0);
+        let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
         painter.translate(pos);
         painter.circle(SIZE * 0.25);
         painter.translate(-pos);
