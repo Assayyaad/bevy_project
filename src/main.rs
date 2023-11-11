@@ -7,8 +7,6 @@ mod board;
 use board::*;
 mod input;
 use input::*;
-// mod ui;
-// use ui::*;
 
 fn main() {
     App::new()
@@ -17,7 +15,7 @@ fn main() {
             color: Color::default(),
             brightness: 0.65,
         })
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(BoardPlugin)
         .add_plugins(PiecesPlugin)
         .add_plugins(InputPlugin)
