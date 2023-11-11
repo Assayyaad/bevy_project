@@ -10,7 +10,6 @@ struct BoardBundle {
 }
 
 pub struct BoardPlugin;
-
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_board);
@@ -35,6 +34,13 @@ fn spawn_board(mut commands: Commands) {
         }
         choice = !choice;
     }
+}
+
+pub fn inside_board(x: f32, y: f32) -> bool {
+    let half = SIZE * 0.5;
+    let min = (0.0 * SIZE) - half;
+    let max = ((MAX as f32 - 1.0) * SIZE) + half;
+    return x > min && x < max && y > min && y < max;
 }
 
 pub fn square_center(x: f32, y: f32) -> Vec2 {

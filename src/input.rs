@@ -46,6 +46,10 @@ fn click_input(
         return;
     };
 
+    if !inside_board(point.x, point.y) {
+        return;
+    }
+
     let no_selection = selection.old.x < 0. || selection.old.y < 0.;
     let pos = square_center(point.x, point.y) / SIZE;
 
