@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use bevy_vector_shapes::prelude::*;
-// use bevy_mod_picking::*;
 
 mod pieces;
 use pieces::*;
@@ -16,8 +15,6 @@ fn main() {
             color: Color::default(),
             brightness: 0.65,
         })
-        // .init_resource::<PickingCamera>()
-        // .add_plugins(DefaultPickingPlugins)
         .add_plugins(DefaultPlugins)
         .add_plugins(BoardPlugin)
         .add_plugins(PiecesPlugin)
@@ -30,7 +27,7 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     let val = SIZE * (MAX as f32 * 0.5);
-    // .insert(PickableBundle::default());
+
 
     commands.spawn(Camera2dBundle {
         transform: Transform::from_translation(Vec3::new(val, val, 0.)),
