@@ -27,6 +27,8 @@ fn main() {
         .run();
 }
 
+// TODO: Make turn plugin
+
 fn setup(mut commands: Commands) {
     let val = SIZE * (MAX as f32 * 0.5);
 

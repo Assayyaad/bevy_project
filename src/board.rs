@@ -45,7 +45,7 @@ pub fn inside_board(x: f32, y: f32) -> bool {
 
 pub fn square_center(x: f32, y: f32) -> Vec2 {
     let mut nearest_x: u8 = 0;
-    let mut smallest_y_diff: f32 = x; // Same as -> ((0 as f32 * SIZE) - x).abs()
+    let mut smallest_y_diff: f32 = x; // NOTE: Same as -> ((0 as f32 * SIZE) - x).abs()
     for i in 1..MAX {
         let diff = ((i as f32 * SIZE) - x).abs();
         if diff < smallest_y_diff {
@@ -55,7 +55,7 @@ pub fn square_center(x: f32, y: f32) -> Vec2 {
     }
 
     let mut nearest_y: u8 = 0;
-    let mut smallest_y_diff: f32 = y; // Same as -> ((0 as f32 * SIZE) - y).abs()
+    let mut smallest_y_diff: f32 = y; // NOTE: Same as -> ((0 as f32 * SIZE) - y).abs()
     for i in 1..MAX {
         let diff = ((i as f32 * SIZE) - y).abs();
         if diff < smallest_y_diff {

@@ -64,6 +64,7 @@ fn click_input(
                 (piece.y as f32 * SIZE) + HALF,
             );
 
+            // FIX: Allow selection based on player turn
             if point.x > min.x && point.x < max.x && point.y > min.y && point.y < max.y {
                 selection.old = pos;
                 break;

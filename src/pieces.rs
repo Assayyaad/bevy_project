@@ -25,7 +25,7 @@ pub enum PieceType {
 pub struct Piece {
     pub my_type: PieceType,
     pub color: PieceColor,
-    // Position
+    // NOTE: Position
     pub x: u8,
     pub y: u8,
 }
@@ -91,7 +91,9 @@ fn move_piece(
         return;
     }
 
-    // TODO: if not move allowed, return
+    // TODO: if move not allowed, return
+    // TODO: else if not empty and ally piece on it, return
+    // TODO: else if path is blocked, return
 
     for (piece_id, mut piece) in piece_query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
