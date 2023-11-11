@@ -45,7 +45,7 @@ impl Plugin for PiecesPlugin {
             .add_systems(Startup, spawn_pieces)
             // .add_systems(Update, draw)
             .add_systems(OnEnter(Game::Draw), add_sprite)
-            .add_systems(Update, (assign_pos, move_pos));
+            .add_systems(Update, (assign_position, move_transform));
     }
 }
 
@@ -104,6 +104,7 @@ fn add_sprite(
     }
 }
 
+// Todo : removing this system we dont need this it anymore , we already replaced by (assign_position, move transform)
 fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
     for piece in query.iter() {
         if piece.color == PieceColor::White {
@@ -123,7 +124,7 @@ fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
 // TODO: else if not empty and ally piece on it, return
 // TODO: else if path is blocked, return
 
-fn assign_pos(
+fn assign_position(
     mut commands: Commands,
     mut selection: ResMut<Selection>,
     mut piece_query: Query<(Entity, &mut Piece)>,
@@ -145,7 +146,7 @@ fn assign_pos(
     selection.new = Vec2::NEG_ONE;
 }
 
-fn move_pos(mut pieces: Query<(&Piece, &mut Transform)>) {
+fn move_transform(mut pieces: Query<(&Piece, &mut Transform)>) {
     for (piece, mut transform) in pieces.iter_mut() {
         let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
         transform.translation = pos;
