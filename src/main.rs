@@ -24,27 +24,14 @@ fn main() {
         // .add_plugin(UIPlugin)
         .add_plugins(Shape2dPlugin::default())
         .add_systems(Startup, setup)
-        // .add_systems(FixedUpdate, keyboard_input)
         .run();
 }
 
 fn setup(mut commands: Commands) {
     let val = SIZE * (MAX as f32 * 0.5);
 
-
     commands.spawn(Camera2dBundle {
         transform: Transform::from_translation(Vec3::new(val, val, 0.)),
         ..Default::default()
     });
 }
-
-// fn keyboard_input(keyboard_input: Res<Input<KeyCode>>, query: Query<&Piece>) {
-//     if keyboard_input.pressed(KeyCode::Space) {
-//         for piece in query.iter() {
-//             println!(
-//                 "{:?} {:?} is at position {:?},",
-//                 piece.colour, piece.name, piece.pos
-//             );
-//         }
-//     }
-// }
