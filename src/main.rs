@@ -5,6 +5,8 @@ mod pieces;
 use pieces::*;
 mod board;
 use board::*;
+mod input;
+use input::*;
 // mod ui;
 // use ui::*;
 
@@ -18,6 +20,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(BoardPlugin)
         .add_plugins(PiecesPlugin)
+        .add_plugins(InputPlugin)
         // .add_plugin(UIPlugin)
         .add_plugins(Shape2dPlugin::default())
         .add_systems(Startup, setup)
