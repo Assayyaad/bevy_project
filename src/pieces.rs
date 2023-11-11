@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use bevy_vector_shapes::prelude::*;
 
-use crate::board::MAX;
-use crate::board::SIZE;
+use crate::{board::MAX, board::SIZE, input::Selection};
 
 const ORDER_LAYER: f32 = 5.0;
 
@@ -35,7 +34,8 @@ pub struct PiecesPlugin;
 impl Plugin for PiecesPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_pieces)
-            .add_systems(Update, draw);
+            .add_systems(Update, draw)
+            .add_systems(PostUpdate, move_piece);
     }
 }
 
@@ -80,4 +80,29 @@ fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
         painter.circle(SIZE * 0.25);
         painter.translate(-pos);
     }
+}
+
+fn move_piece(
+    mut commands: Commands,
+    mut selection: ResMut<Selection>,
+    mut piece_query: Query<(Entity, &mut Piece)>,
+) {
+    if selection.new == Vec2::NEG_ONE {
+        return;
+    }
+
+    // TODO: if not move allowed, return
+
+    for (piece_id, mut piece) in piece_query.iter_mut() {
+        let pos = Vec2::new(piece.x as f32, piece.y as f32);
+        if pos == selection.old {
+            piece.x = selection.new.x as u8;
+            piece.y = selection.new.y as u8;
+        } else if pos == selection.new {
+            commands.entity(piece_id).despawn();
+        }
+    }
+
+    selection.old = Vec2::NEG_ONE;
+    selection.new = Vec2::NEG_ONE;
 }
