@@ -108,6 +108,10 @@ fn move_pieces(
     if selection.new == Vec2::NEG_ONE {
         return;
     }
+
+    let mut check1 = false;
+    let mut check2 = false;
+
     for (id, mut piece, mut transform) in query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
         if pos == selection.old {
@@ -116,11 +120,19 @@ fn move_pieces(
 
             transform.translation =
                 Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
-            role.next();
+            check1 = true;
         } else if pos == selection.new {
             commands.entity(id).despawn();
-            role.next();
+            check2 = true;
         }
+
+        if check1 && check2 {
+            break;
+        }
+    }
+
+    if check1 || check2 {
+        role.next();
     }
 
     selection.old = Vec2::NEG_ONE;
