@@ -15,7 +15,8 @@ struct BoardBundle {
 pub struct BoardPlugin;
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, load_sprites)
+        app.insert_resource(ClearColor(Color::rgb_u8(57, 31, 33)))
+            .add_systems(Startup, load_sprites)
             .add_systems(Update, draw_selected);
     }
 }

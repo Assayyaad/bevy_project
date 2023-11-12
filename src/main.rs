@@ -10,7 +10,6 @@ use input::*;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::YELLOW_GREEN))
         .insert_resource(AmbientLight {
             color: Color::default(),
             brightness: 0.65,
