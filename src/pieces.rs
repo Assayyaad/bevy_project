@@ -76,8 +76,11 @@ fn load_sprites(
     for (id, piece) in query.iter() {
         commands.entity(id).insert(SpriteBundle {
             texture: {
-                let image_path =
-                    format!("{:?}_{:?}.png", piece.color, piece.my_type).to_lowercase();
+                let image_path = format!(
+                    "ARABIAN CHESS/sprites/pieces/{:?}_{:?}.png",
+                    piece.color, piece.my_type
+                )
+                .to_lowercase();
                 asset_server.load(image_path)
             },
             transform: {
