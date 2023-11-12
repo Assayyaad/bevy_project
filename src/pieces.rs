@@ -5,14 +5,6 @@ use crate::{board::MAX, board::SIZE, input::Selection};
 
 const ORDER_LAYER: f32 = 5.0;
 
-#[derive(States, Default, Debug, Hash, PartialEq, Eq, Clone)]
-enum Game {
-    #[default]
-    Menu,
-    Setup,
-    Draw,
-}
-
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum PieceColor {
     White,
@@ -41,15 +33,15 @@ pub struct Piece {
 pub struct PiecesPlugin;
 impl Plugin for PiecesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<Game>()
-            .add_systems(Startup, spawn_pieces)
+        // app.add_state::<Game>()
+        app.add_systems(Startup, spawn_pieces)
+            .add_systems(PostStartup, add_sprite)
             // .add_systems(Update, draw)
-            .add_systems(OnEnter(Game::Draw), add_sprite)
             .add_systems(Update, (assign_position, move_transform));
     }
 }
 
-fn spawn_pieces(mut commands: Commands, mut game_state: ResMut<NextState<Game>>) {
+fn spawn_pieces(mut commands: Commands) {
     let chess_pieces: [(PieceType, Vec<(u8, u8)>); 6] = [
         (PieceType::King, vec![(4, 0)]),
         (PieceType::Queen, vec![(3, 0)]),
@@ -75,8 +67,6 @@ fn spawn_pieces(mut commands: Commands, mut game_state: ResMut<NextState<Game>>)
             });
         }
     }
-
-    game_state.set(Game::Draw);
 }
 
 const SCALER: f32 = 2.;
