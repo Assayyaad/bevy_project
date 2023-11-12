@@ -13,34 +13,34 @@ impl Plugin for InputPlugin {
             old: Vec2::NEG_ONE,
             new: Vec2::NEG_ONE,
         })
-        .insert_resource(RoleInfo::default())
-        .add_systems(Startup, spawn_role_text)
-        .add_systems(Update, (click_input, role_text_update));
+        .insert_resource(TurnManager::default())
+        .add_systems(Startup, spawn_turn_text)
+        .add_systems(Update, (click_input, update_turn_text));
     }
 }
 
 #[derive(Resource, Default, PartialEq, Debug)]
-pub struct RoleInfo(PieceColor);
+pub struct TurnManager(PieceColor);
 
-impl RoleInfo {
-    pub fn next(&mut self) {
+impl TurnManager {
+    pub fn next_turn(&mut self) {
         match self.0 {
             PieceColor::Black => self.0 = PieceColor::White,
             PieceColor::White => self.0 = PieceColor::Black,
         }
     }
-    pub fn is_equal(&self, piece_color: PieceColor) -> bool {
-        self.0 == piece_color
+    pub fn same_color(&self, color: PieceColor) -> bool {
+        self.0 == color
     }
 }
 
 #[derive(Component)]
-struct RoleText;
+struct TurnText;
 
-fn spawn_role_text(mut commands: Commands, role: Res<RoleInfo>) {
+fn spawn_turn_text(mut commands: Commands, manager: Res<TurnManager>) {
     commands.spawn((
         TextBundle::from_section(
-            format!("{:?} player turn !", *role),
+            format!("{:?} player turn !", *manager),
             TextStyle {
                 font_size: 50.0,
                 ..default()
@@ -56,16 +56,16 @@ fn spawn_role_text(mut commands: Commands, role: Res<RoleInfo>) {
         RoleText,
     ));
 }
-fn role_text_update(mut query: Query<&mut Text, With<RoleText>>, role: Res<RoleInfo>) {
-    if role.is_changed() {
+fn update_turn_text(mut query: Query<&mut Text, With<TurnText>>, manager: Res<TurnManager>) {
+    if manager.is_changed() {
         for mut text in query.iter_mut() {
-            text.sections[0].value = format!("{:?} player turn !", *role);
+            text.sections[0].value = format!("{:?} player turn !", *manager);
         }
     }
 }
 
 fn click_input(
-    role: Res<RoleInfo>,
+    manager: Res<TurnManager>,
     mut selection: ResMut<Selection>,
     mouse_button_input: Res<Input<MouseButton>>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
@@ -110,12 +110,11 @@ fn click_input(
                 (piece.y as f32 * SIZE) + HALF,
             );
 
-            // FIX: Allow selection based on player turn
             if point.x > min.x
                 && point.x < max.x
                 && point.y > min.y
                 && point.y < max.y
-                && role.is_equal(piece.color)
+                && manager.same_color(piece.color)
             {
                 selection.old = pos;
                 break;

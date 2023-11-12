@@ -1,5 +1,3 @@
-use std::default;
-
 use super::*;
 
 const ORDER_LAYER: f32 = 5.0;
@@ -103,7 +101,7 @@ fn move_pieces(
     mut commands: Commands,
     mut selection: ResMut<Selection>,
     mut query: Query<(Entity, &mut Piece, &mut Transform)>,
-    mut role: ResMut<RoleInfo>,
+    mut manager: ResMut<TurnManager>,
 ) {
     if selection.new == Vec2::NEG_ONE {
         return;
@@ -132,7 +130,7 @@ fn move_pieces(
     }
 
     if check1 || check2 {
-        role.next();
+        manager.next_turn();
     }
 
     selection.old = Vec2::NEG_ONE;
