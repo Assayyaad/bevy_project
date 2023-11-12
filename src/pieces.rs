@@ -1,6 +1,4 @@
-use bevy::prelude::*;
-
-use crate::{board::MAX, board::SIZE, input::Selection};
+use super::*;
 
 const ORDER_LAYER: f32 = 5.0;
 const SCALER: f32 = 2.;
@@ -102,6 +100,7 @@ fn move_pieces(
     mut commands: Commands,
     mut selection: ResMut<Selection>,
     mut query: Query<(Entity, &mut Piece, &mut Transform)>,
+    mut role: ResMut<RoleInfo>,
 ) {
     if selection.new == Vec2::NEG_ONE {
         return;
@@ -114,8 +113,10 @@ fn move_pieces(
 
             transform.translation =
                 Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
+            role.next();
         } else if pos == selection.new {
             commands.entity(id).despawn();
+            role.next();
         }
     }
 

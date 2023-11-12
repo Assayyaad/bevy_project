@@ -1,4 +1,3 @@
-use super::*;
 use bevy::prelude::*;
 use bevy_vector_shapes::prelude::*;
 
@@ -47,7 +46,7 @@ fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn inside_board(x: f32, y: f32) -> bool {
     let half = SIZE * 0.5;
-    let min = (0.0 * SIZE) - half;
+    let min = (0.0 * SIZE) - half; // NOTE: should be min = - half
     let max = ((MAX as f32 - 1.0) * SIZE) + half;
     return x > min && x < max && y > min && y < max;
 }
