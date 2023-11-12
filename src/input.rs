@@ -136,30 +136,30 @@ fn select_area(
     let no_selection = selection.old.x < 0. || selection.old.y < 0.;
     let pos = square_center(point.x, point.y) / SIZE;
 
-    if no_selection {
-        for piece in query.iter() {
-            let min = Vec2::new(
-                (piece.x as f32 * SIZE) - HALF,
-                (piece.y as f32 * SIZE) - HALF,
-            );
-            let max = Vec2::new(
-                (piece.x as f32 * SIZE) + HALF,
-                (piece.y as f32 * SIZE) + HALF,
-            );
+    for piece in query.iter() {
+        let min = Vec2::new(
+            (piece.x as f32 * SIZE) - HALF,
+            (piece.y as f32 * SIZE) - HALF,
+        );
+        let max = Vec2::new(
+            (piece.x as f32 * SIZE) + HALF,
+            (piece.y as f32 * SIZE) + HALF,
+        );
+        let piece_boarder =
+            point.x > min.x && point.y > min.y && point.x < max.x && point.y < max.y;
 
-            if point.x > min.x
-                && point.x < max.x
-                && point.y > min.y
-                && point.y < max.y
-                && turn_manager.same_color(piece.color)
-            {
+        if no_selection {
+            if piece_boarder && turn_manager.same_color(piece.color) {
                 selection.old = pos;
                 break;
             }
-        }
-    } else {
-        if pos != selection.old {
-            selection.new = pos;
+        } else if pos != selection.old {
+            if piece_boarder && turn_manager.same_color(piece.color) {
+                selection.new = Vec2::NEG_ONE;
+                break;
+            } else {
+                selection.new = pos;
+            }
         }
     }
 }
