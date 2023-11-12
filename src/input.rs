@@ -20,28 +20,17 @@ impl Plugin for InputPlugin {
 }
 
 #[derive(Resource, Default, PartialEq, Debug)]
-pub enum RoleInfo {
-    #[default]
-    Black,
-    White,
-}
+pub struct RoleInfo(PieceColor);
 
 impl RoleInfo {
     pub fn next(&mut self) {
-        match *self {
-            RoleInfo::Black => *self = RoleInfo::White,
-            RoleInfo::White => *self = RoleInfo::Black,
+        match self.0 {
+            PieceColor::Black => self.0 = PieceColor::White,
+            PieceColor::White => self.0 = PieceColor::Black,
         }
     }
     pub fn is_equal(&self, piece_color: PieceColor) -> bool {
-        if *self == RoleInfo::Black && piece_color == PieceColor::Black {
-            return true;
-        }
-        if *self == RoleInfo::White && piece_color == PieceColor::White {
-            return true;
-        }
-
-        return false;
+        self.0 == piece_color
     }
 }
 

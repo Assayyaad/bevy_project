@@ -1,10 +1,13 @@
+use std::default;
+
 use super::*;
 
 const ORDER_LAYER: f32 = 5.0;
 const SCALER: f32 = 2.;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, Default)]
 pub enum PieceColor {
+    #[default]
     White,
     Black,
 }
