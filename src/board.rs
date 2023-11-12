@@ -1,3 +1,4 @@
+use super::*;
 use bevy::prelude::*;
 
 pub const SIZE: f32 = 50.0;

@@ -1,5 +1,4 @@
-use bevy::{prelude::*, transform};
-use bevy_vector_shapes::prelude::*;
+use bevy::prelude::*;
 
 use crate::{board::MAX, board::SIZE, input::Selection};
 
@@ -101,22 +100,6 @@ fn add_sprite(
             },
             ..Default::default()
         });
-    }
-}
-
-// Todo : removing this system we dont need this it anymore , we already replaced by (assign_position, move transform)
-fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
-    for piece in query.iter() {
-        if piece.color == PieceColor::White {
-            painter.color = Color::CYAN;
-        } else {
-            painter.color = Color::PINK;
-        }
-
-        let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
-        painter.translate(pos);
-        painter.circle(SIZE * 0.25);
-        painter.translate(-pos);
     }
 }
 
