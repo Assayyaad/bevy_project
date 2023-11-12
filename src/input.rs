@@ -13,9 +13,17 @@ impl Plugin for InputPlugin {
             old: Vec2::NEG_ONE,
             new: Vec2::NEG_ONE,
         })
+        .insert_resource(CursorWorld::default())
         .insert_resource(TurnManager::default())
         .add_systems(Startup, spawn_turn_text)
-        .add_systems(Update, click_input)
+        .add_systems(
+            Update,
+            (
+                select_area,
+                cursor_window_to_world,
+                bevy::window::close_on_esc,
+            ),
+        )
         .add_systems(FixedUpdate, update_turn_text);
     }
 }
@@ -68,25 +76,46 @@ fn spawn_turn_text(mut commands: Commands) {
 fn update_turn_text(
     mut query: Query<&mut Text, With<TurnText>>,
     windows: Query<&Window>,
-    manager: Res<TurnManager>,
+    turn_manager: Res<TurnManager>,
 ) {
-    if !manager.is_changed() {
+    if !turn_manager.is_changed() {
         return;
     }
 
     for mut text in query.iter_mut() {
-        text.sections[0].value = format!("{:?} player turn", manager.0);
+        text.sections[0].value = format!("{:?} player turn", turn_manager.0);
         text.sections[0].style.font_size = windows.single().resolution.width() * 0.032;
     }
 }
 
-fn click_input(
-    manager: Res<TurnManager>,
-    mut selection: ResMut<Selection>,
-    mouse_button_input: Res<Input<MouseButton>>,
+// mouse pos hundler
+
+#[derive(Resource, Default)]
+pub struct CursorWorld {
+    pub pos: Vec2,
+}
+
+fn cursor_window_to_world(
+    mut cursor_world: ResMut<CursorWorld>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     windows: Query<&Window>,
+) {
+    let Some(cursor_pos) = windows.single().cursor_position() else {
+        return;
+    };
+    let (camera, camera_transform) = camera_query.single();
+    let Some(point) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else {
+        return;
+    };
+    cursor_world.pos = point;
+}
+
+fn select_area(
+    mut selection: ResMut<Selection>,
+    turn_manager: Res<TurnManager>,
     query: Query<&Piece>,
+    cursor_world: Res<CursorWorld>,
+    mouse_button_input: Res<Input<MouseButton>>,
 ) {
     if mouse_button_input.just_pressed(MouseButton::Right) {
         selection.old = Vec2::NEG_ONE;
@@ -99,15 +128,7 @@ fn click_input(
         return;
     }
 
-    let Some(cursor_pos) = windows.single().cursor_position() else {
-        return;
-    };
-
-    let (camera, camera_transform) = camera_query.single();
-    let Some(point) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else {
-        return;
-    };
-
+    let point = cursor_world.pos;
     if !inside_board(point.x, point.y) {
         return;
     }
@@ -130,7 +151,7 @@ fn click_input(
                 && point.x < max.x
                 && point.y > min.y
                 && point.y < max.y
-                && manager.same_color(piece.color)
+                && turn_manager.same_color(piece.color)
             {
                 selection.old = pos;
                 break;
