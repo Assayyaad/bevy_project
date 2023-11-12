@@ -1,4 +1,7 @@
 use bevy::prelude::*;
+use bevy_vector_shapes::prelude::*;
+
+use crate::input::Selection;
 
 pub const SIZE: f32 = 50.0;
 pub const MAX: u8 = 8;
@@ -12,7 +15,8 @@ struct BoardBundle {
 pub struct BoardPlugin;
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_board);
+        app.add_systems(Startup, spawn_board)
+            .add_systems(Update, draw_selected);
     }
 }
 
@@ -65,6 +69,22 @@ pub fn square_center(x: f32, y: f32) -> Vec2 {
     }
 
     return Vec2::new(nearest_x as f32 * SIZE, nearest_y as f32 * SIZE);
+}
+
+fn draw_selected(mut painter: ShapePainter, selection: Res<Selection>) {
+    if selection.old == Vec2::NEG_ONE {
+        return;
+    }
+
+    let pos = Vec3::new(
+        selection.old.x * SIZE,
+        selection.old.y * SIZE,
+        ORDER_LAYER + 1.,
+    );
+    painter.set_translation(pos);
+
+    painter.color = Color::ORANGE;
+    painter.circle(SIZE * 0.4);
 }
 
 //
