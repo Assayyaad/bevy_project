@@ -1,5 +1,8 @@
 use super::*;
 use bevy::prelude::*;
+use bevy_vector_shapes::prelude::*;
+
+use crate::input::Selection;
 
 pub const SIZE: f32 = 50.0;
 pub const MAX: u8 = 8;
@@ -13,22 +16,27 @@ struct BoardBundle {
 pub struct BoardPlugin;
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_board);
+        app.insert_resource(ClearColor(Color::rgb_u8(57, 31, 33)))
+            .add_systems(Startup, load_sprites)
+            .add_systems(Update, draw_selected);
     }
 }
 
-fn spawn_board(mut commands: Commands) {
+fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
     let mut choice = true;
+    let white_image_path = "ARABIAN CHESS/sprites/board/board_square_white.png";
+    let black_image_path = "ARABIAN CHESS/sprites/board/board_square_black.png";
 
     for i in 0..MAX {
         for j in 0..MAX {
             commands.spawn(SpriteBundle {
-                sprite: Sprite {
-                    color: if choice { Color::WHITE } else { Color::BLACK },
-                    custom_size: Some(Vec2::ONE * SIZE),
-                    ..default()
+                texture: if choice {
+                    asset_server.load(white_image_path)
+                } else {
+                    asset_server.load(black_image_path)
                 },
-                transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), ORDER_LAYER),
+                transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), ORDER_LAYER)
+                    .with_scale(Vec3::ONE * 3.15),
                 ..default()
             });
             choice = !choice;
@@ -66,6 +74,22 @@ pub fn square_center(x: f32, y: f32) -> Vec2 {
     }
 
     return Vec2::new(nearest_x as f32 * SIZE, nearest_y as f32 * SIZE);
+}
+
+fn draw_selected(mut painter: ShapePainter, selection: Res<Selection>) {
+    if selection.old == Vec2::NEG_ONE {
+        return;
+    }
+
+    let pos = Vec3::new(
+        selection.old.x * SIZE,
+        selection.old.y * SIZE,
+        ORDER_LAYER + 1.,
+    );
+    painter.set_translation(pos);
+
+    painter.color = Color::ORANGE;
+    painter.circle(SIZE * 0.4);
 }
 
 //
