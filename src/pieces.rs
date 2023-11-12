@@ -36,7 +36,6 @@ impl Plugin for PiecesPlugin {
         // app.add_state::<Game>()
         app.add_systems(Startup, spawn_pieces)
             .add_systems(PostStartup, add_sprite)
-            // .add_systems(Update, draw)
             .add_systems(Update, move_pieces);
     }
 }
@@ -91,22 +90,6 @@ fn add_sprite(
             },
             ..Default::default()
         });
-    }
-}
-
-// Todo : removing this system we dont need this it anymore , we already replaced by (assign_position, move transform)
-fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
-    for piece in query.iter() {
-        if piece.color == PieceColor::White {
-            painter.color = Color::CYAN;
-        } else {
-            painter.color = Color::PINK;
-        }
-
-        let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
-        painter.translate(pos);
-        painter.circle(SIZE * 0.25);
-        painter.translate(-pos);
     }
 }
 
