@@ -15,7 +15,8 @@ impl Plugin for InputPlugin {
         })
         .insert_resource(TurnManager::default())
         .add_systems(Startup, spawn_turn_text)
-        .add_systems(Update, (click_input, update_turn_text));
+        .add_systems(Update, click_input)
+        .add_systems(FixedUpdate, update_turn_text);
     }
 }
 
@@ -37,18 +38,11 @@ impl TurnManager {
 #[derive(Component)]
 struct TurnText;
 
-fn spawn_turn_text(mut commands: Commands, windows: Query<&Window>) {
-    let section = TextSection {
-        style: TextStyle {
-            font_size: windows.single().resolution.width() * 0.032,
-            ..default()
-        },
-        ..default()
-    };
+fn spawn_turn_text(mut commands: Commands) {
     commands.spawn((
         TextBundle {
             text: Text {
-                sections: vec![section],
+                sections: vec![TextSection::default()],
                 alignment: TextAlignment::Center,
                 ..default()
             },
@@ -71,13 +65,18 @@ fn spawn_turn_text(mut commands: Commands, windows: Query<&Window>) {
     ));
 }
 
-fn update_turn_text(mut query: Query<&mut Text, With<TurnText>>, manager: Res<TurnManager>) {
+fn update_turn_text(
+    mut query: Query<&mut Text, With<TurnText>>,
+    windows: Query<&Window>,
+    manager: Res<TurnManager>,
+) {
     if !manager.is_changed() {
         return;
     }
 
     for mut text in query.iter_mut() {
         text.sections[0].value = format!("{:?} player turn", manager.0);
+        text.sections[0].style.font_size = windows.single().resolution.width() * 0.032;
     }
 }
 

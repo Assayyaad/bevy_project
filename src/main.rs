@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::window::*;
 use bevy_vector_shapes::prelude::*;
 
 mod pieces;
@@ -14,17 +15,26 @@ fn main() {
             color: Color::default(),
             brightness: 0.65,
         })
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        mode: WindowMode::BorderlessFullscreen,
+                        resizable: false,
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
         .add_plugins(BoardPlugin)
         .add_plugins(PiecesPlugin)
         .add_plugins(InputPlugin)
         // .add_plugin(UIPlugin)
         .add_plugins(Shape2dPlugin::default())
-        .add_systems(Startup, setup)
+        .add_systems(PreStartup, setup)
         .run();
 }
-
-// TODO: Make turn plugin
 
 fn setup(mut commands: Commands) {
     let val = SIZE * (MAX as f32 * 0.5);
