@@ -37,30 +37,47 @@ impl TurnManager {
 #[derive(Component)]
 struct TurnText;
 
-fn spawn_turn_text(mut commands: Commands, manager: Res<TurnManager>) {
+fn spawn_turn_text(mut commands: Commands, windows: Query<&Window>) {
+    let section = TextSection {
+        style: TextStyle {
+            font_size: windows.single().resolution.width() * 0.032,
+            ..default()
+        },
+        ..default()
+    };
     commands.spawn((
-        TextBundle::from_section(
-            format!("{:?} player turn !", *manager),
-            TextStyle {
-                font_size: 50.0,
+        TextBundle {
+            text: Text {
+                sections: vec![section],
+                alignment: TextAlignment::Center,
                 ..default()
             },
-        )
-        .with_text_alignment(TextAlignment::Center)
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            bottom: Val::Px(50.0),
-            right: Val::Px(400.0),
+            style: Style {
+                position_type: PositionType::Absolute,
+                align_self: AlignSelf::Center,
+                align_content: AlignContent::Center,
+                align_items: AlignItems::Center,
+
+                bottom: Val::Percent(80.0),
+                right: Val::Percent(35.0),
+                left: Val::Percent(35.0),
+
+                width: Val::Percent(30.0),
+                ..default()
+            },
             ..default()
-        }),
-        RoleText,
+        },
+        TurnText,
     ));
 }
+
 fn update_turn_text(mut query: Query<&mut Text, With<TurnText>>, manager: Res<TurnManager>) {
-    if manager.is_changed() {
-        for mut text in query.iter_mut() {
-            text.sections[0].value = format!("{:?} player turn !", *manager);
-        }
+    if !manager.is_changed() {
+        return;
+    }
+
+    for mut text in query.iter_mut() {
+        text.sections[0].value = format!("{:?} player turn", manager.0);
     }
 }
 
