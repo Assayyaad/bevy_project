@@ -37,7 +37,7 @@ impl Plugin for PiecesPlugin {
         app.add_systems(Startup, spawn_pieces)
             .add_systems(PostStartup, add_sprite)
             // .add_systems(Update, draw)
-            .add_systems(Update, (assign_position, move_transform));
+            .add_systems(Update, move_pieces);
     }
 }
 
@@ -114,19 +114,22 @@ fn draw(mut painter: ShapePainter, query: Query<&Piece>) {
 // TODO: else if not empty and ally piece on it, return
 // TODO: else if path is blocked, return
 
-fn assign_position(
+fn move_pieces(
     mut commands: Commands,
     mut selection: ResMut<Selection>,
-    mut piece_query: Query<(Entity, &mut Piece)>,
+    mut piece_query: Query<(Entity, &mut Piece, &mut Transform)>,
 ) {
     if selection.new == Vec2::NEG_ONE {
         return;
     }
-    for (piece_id, mut piece) in piece_query.iter_mut() {
+    for (piece_id, mut piece, mut transform) in piece_query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
         if pos == selection.old {
             piece.x = selection.new.x as u8;
             piece.y = selection.new.y as u8;
+
+            transform.translation =
+                Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
         } else if pos == selection.new {
             commands.entity(piece_id).despawn();
         }
@@ -134,11 +137,4 @@ fn assign_position(
 
     selection.old = Vec2::NEG_ONE;
     selection.new = Vec2::NEG_ONE;
-}
-
-fn move_transform(mut pieces: Query<(&Piece, &mut Transform)>) {
-    for (piece, mut transform) in pieces.iter_mut() {
-        let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
-        transform.translation = pos;
-    }
 }
