@@ -13,17 +13,9 @@ impl Plugin for InputPlugin {
             old: Vec2::NEG_ONE,
             new: Vec2::NEG_ONE,
         })
-        .insert_resource(CursorWorld::default())
         .insert_resource(TurnManager::default())
         .add_systems(Startup, spawn_turn_text)
-        .add_systems(
-            Update,
-            (
-                select_area,
-                cursor_window_to_world,
-                bevy::window::close_on_esc,
-            ),
-        )
+        .add_systems(Update, (click_input, bevy::window::close_on_esc))
         .add_systems(FixedUpdate, update_turn_text);
     }
 }
@@ -88,33 +80,12 @@ fn update_turn_text(
     }
 }
 
-// mouse pos hundler
-
-#[derive(Resource, Default)]
-pub struct CursorWorld {
-    pub pos: Vec2,
-}
-
-fn cursor_window_to_world(
-    mut cursor_world: ResMut<CursorWorld>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
-    windows: Query<&Window>,
-) {
-    let Some(cursor_pos) = windows.single().cursor_position() else {
-        return;
-    };
-    let (camera, camera_transform) = camera_query.single();
-    let Some(point) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else {
-        return;
-    };
-    cursor_world.pos = point;
-}
-
-fn select_area(
+fn click_input(
     mut selection: ResMut<Selection>,
     turn_manager: Res<TurnManager>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    windows: Query<&Window>,
     query: Query<&Piece>,
-    cursor_world: Res<CursorWorld>,
     mouse_button_input: Res<Input<MouseButton>>,
 ) {
     if mouse_button_input.just_pressed(MouseButton::Right) {
@@ -128,7 +99,15 @@ fn select_area(
         return;
     }
 
-    let point = cursor_world.pos;
+    let Some(cursor_pos) = windows.single().cursor_position() else {
+        return;
+    };
+
+    let (camera, camera_transform) = camera_query.single();
+    let Some(point) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else {
+        return;
+    };
+
     if !inside_board(point.x, point.y) {
         return;
     }
@@ -136,30 +115,25 @@ fn select_area(
     let no_selection = selection.old.x < 0. || selection.old.y < 0.;
     let pos = square_center(point.x, point.y) / SIZE;
 
-    for piece in query.iter() {
-        let min = Vec2::new(
-            (piece.x as f32 * SIZE) - HALF,
-            (piece.y as f32 * SIZE) - HALF,
-        );
-        let max = Vec2::new(
-            (piece.x as f32 * SIZE) + HALF,
-            (piece.y as f32 * SIZE) + HALF,
-        );
-        let piece_boarder =
-            point.x > min.x && point.y > min.y && point.x < max.x && point.y < max.y;
+    if no_selection {
+        for piece in query.iter() {
+            let min = Vec2::new(
+                (piece.x as f32 * SIZE) - HALF,
+                (piece.y as f32 * SIZE) - HALF,
+            );
+            let max = Vec2::new(
+                (piece.x as f32 * SIZE) + HALF,
+                (piece.y as f32 * SIZE) + HALF,
+            );
+            let piece_boarder =
+                point.x > min.x && point.y > min.y && point.x < max.x && point.y < max.y;
 
-        if no_selection {
             if piece_boarder && turn_manager.same_color(piece.color) {
                 selection.old = pos;
                 break;
             }
-        } else if pos != selection.old {
-            if piece_boarder && turn_manager.same_color(piece.color) {
-                selection.new = Vec2::NEG_ONE;
-                break;
-            } else {
-                selection.new = pos;
-            }
         }
+    } else if pos != selection.old {
+        selection.new = pos;
     }
 }
