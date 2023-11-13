@@ -94,7 +94,6 @@ fn load_sprites(
 }
 
 // TODO: if move not allowed, return
-// TODO: else if not empty and ally piece on it, return
 // TODO: else if path is blocked, return
 
 fn move_pieces(
@@ -109,18 +108,16 @@ fn move_pieces(
 
     let mut check1 = false;
     let mut check2 = false;
+    let mut attacker: Option<(Mut<'_, Piece>, Mut<'_, Transform>)> = None;
+    let mut defender: Option<(Mut<'_, Piece>, Entity)> = None;
 
-    for (id, mut piece, mut transform) in query.iter_mut() {
+    for (id, piece, transform) in query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
         if pos == selection.old {
-            piece.x = selection.new.x as u8;
-            piece.y = selection.new.y as u8;
-
-            transform.translation =
-                Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
+            attacker = Some((piece, transform));
             check1 = true;
         } else if pos == selection.new {
-            commands.entity(id).despawn();
+            defender = Some((piece, id));
             check2 = true;
         }
 
@@ -129,10 +126,25 @@ fn move_pieces(
         }
     }
 
-    if check1 || check2 {
-        manager.next_turn();
+    let Some(mut attack) = attacker else {
+        return;
+    };
+
+    if let Some(defend) = defender {
+        if defend.0.color == attack.0.color {
+            selection.new = Vec2::NEG_ONE;
+            return;
+        }
+
+        commands.entity(defend.1).despawn();
     }
+
+    attack.0.x = selection.new.x as u8;
+    attack.0.y = selection.new.y as u8;
+
+    attack.1.translation = Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
 
     selection.old = Vec2::NEG_ONE;
     selection.new = Vec2::NEG_ONE;
+    manager.next_turn();
 }
