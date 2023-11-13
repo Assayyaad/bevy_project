@@ -98,7 +98,7 @@ fn move_pieces(
     mut query: Query<(Entity, &mut Piece, &mut Transform)>,
     mut manager: ResMut<TurnManager>,
 ) {
-    if selection.new == Vec2::NEG_ONE {
+    if selection.to == Vec2::NEG_ONE {
         return;
     }
 
@@ -108,9 +108,9 @@ fn move_pieces(
 
     for (id, piece, transform) in query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
-        if pos == selection.old {
+        if pos == selection.from {
             attacker = Some((piece, transform));
-        } else if pos == selection.new {
+        } else if pos == selection.to {
             defender = Some((piece, transform, id));
         }
 
@@ -150,24 +150,24 @@ fn move_pieces(
                 // NOTE: 3. The king should not be in check.
                 // NOTE: 4. The squares that the king crosses and ends up on should not be under attack.
 
-                move_piece(defend.0, defend.1, selection.old);
-                move_piece(attack.0, attack.1, selection.new);
-                selection.old = Vec2::NEG_ONE;
-                selection.new = Vec2::NEG_ONE;
+                move_piece(defend.0, defend.1, selection.from);
+                move_piece(attack.0, attack.1, selection.to);
+                selection.from = Vec2::NEG_ONE;
+                selection.to = Vec2::NEG_ONE;
                 manager.next_turn();
                 return;
             }
 
-            selection.new = Vec2::NEG_ONE;
+            selection.to = Vec2::NEG_ONE;
             return;
         }
 
         commands.entity(defend.2).despawn();
     }
 
-    move_piece(attack.0, attack.1, selection.new);
-    selection.old = Vec2::NEG_ONE;
-    selection.new = Vec2::NEG_ONE;
+    move_piece(attack.0, attack.1, selection.to);
+    selection.from = Vec2::NEG_ONE;
+    selection.to = Vec2::NEG_ONE;
     manager.next_turn();
 
     fn move_piece(mut piece: Mut<'_, Piece>, mut transform: Mut<'_, Transform>, pos: Vec2) {

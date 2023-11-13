@@ -2,16 +2,16 @@ use super::*;
 
 #[derive(Default, Resource)]
 pub struct Selection {
-    pub old: Vec2,
-    pub new: Vec2,
+    pub from: Vec2,
+    pub to: Vec2,
 }
 
 pub struct InputPlugin;
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Selection {
-            old: Vec2::NEG_ONE,
-            new: Vec2::NEG_ONE,
+            from: Vec2::NEG_ONE,
+            to: Vec2::NEG_ONE,
         })
         .insert_resource(TurnManager::default())
         .add_systems(Startup, spawn_turn_text)
@@ -89,8 +89,8 @@ fn click_input(
     pieces: Query<&Piece>,
 ) {
     if mouse_button_input.just_pressed(MouseButton::Right) {
-        selection.old = Vec2::NEG_ONE;
-        selection.new = Vec2::NEG_ONE;
+        selection.from = Vec2::NEG_ONE;
+        selection.to = Vec2::NEG_ONE;
         return;
     }
 
@@ -113,7 +113,7 @@ fn click_input(
 
     let pos = square_center(point.x, point.y) / SIZE;
 
-    if selection.old == Vec2::NEG_ONE {
+    if selection.from == Vec2::NEG_ONE {
         for piece in pieces.iter() {
             let center = Vec2::new(piece.x as f32, piece.y as f32) * SIZE;
             let min = center - HALF_SIZE;
@@ -123,24 +123,21 @@ fn click_input(
                 point.x > min.x && point.y > min.y && point.x < max.x && point.y < max.y;
 
             if inside_square && turn_manager.same_color(piece.color) {
-                selection.old = pos;
+                selection.from = pos;
                 break;
             }
         }
-    } else if pos != selection.old
+    } else if pos != selection.from
         && valid_path(
             (
-                (selection.old.x / SIZE) as u8,
-                (selection.old.y / SIZE) as u8,
+                (selection.from.x / SIZE) as u8,
+                (selection.from.y / SIZE) as u8,
             ),
-            (
-                (selection.new.x / SIZE) as u8,
-                (selection.new.y / SIZE) as u8,
-            ),
+            ((selection.to.x / SIZE) as u8, (selection.to.y / SIZE) as u8),
             pieces,
         )
     {
-        selection.new = pos;
+        selection.to = pos;
     }
 }
 

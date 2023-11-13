@@ -72,18 +72,18 @@ pub fn square_center(x: f32, y: f32) -> Vec2 {
 }
 
 fn draw_selected(mut painter: ShapePainter, selection: Res<Selection>) {
-    if selection.old == Vec2::NEG_ONE {
+    if selection.from == Vec2::NEG_ONE {
         return;
     }
 
     let pos = Vec3::new(
-        selection.old.x * SIZE,
-        selection.old.y * SIZE,
+        selection.from.x * SIZE,
+        selection.from.y * SIZE,
         ORDER_LAYER + 1.,
     );
     painter.set_translation(pos);
 
-    painter.color = Color::ORANGE;
+    painter.color = Color::WHITE;
     painter.circle(SIZE * 0.5);
 }
 
