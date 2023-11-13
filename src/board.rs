@@ -4,6 +4,7 @@ use bevy_vector_shapes::prelude::*;
 use crate::input::Selection;
 
 pub const SIZE: f32 = 50.0;
+pub const HALF_SIZE: f32 = SIZE * 0.5;
 pub const MAX: u8 = 8;
 const ORDER_LAYER: f32 = 0.0;
 

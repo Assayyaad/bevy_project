@@ -83,10 +83,10 @@ fn update_turn_text(
 fn click_input(
     mut selection: ResMut<Selection>,
     turn_manager: Res<TurnManager>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
-    windows: Query<&Window>,
-    query: Query<&Piece>,
     mouse_button_input: Res<Input<MouseButton>>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
+    windows: Query<&Window>,
+    pieces: Query<&Piece>,
 ) {
     if mouse_button_input.just_pressed(MouseButton::Right) {
         selection.old = Vec2::NEG_ONE;
@@ -94,7 +94,6 @@ fn click_input(
         return;
     }
 
-    const HALF: f32 = SIZE as f32 * 0.5;
     if !mouse_button_input.just_pressed(MouseButton::Left) {
         return;
     }
@@ -103,7 +102,7 @@ fn click_input(
         return;
     };
 
-    let (camera, camera_transform) = camera_query.single();
+    let (camera, camera_transform) = cameras.single();
     let Some(point) = camera.viewport_to_world_2d(camera_transform, cursor_pos) else {
         return;
     };
@@ -112,23 +111,18 @@ fn click_input(
         return;
     }
 
-    let no_selection = selection.old.x < 0. || selection.old.y < 0.;
     let pos = square_center(point.x, point.y) / SIZE;
 
-    if no_selection {
-        for piece in query.iter() {
-            let min = Vec2::new(
-                (piece.x as f32 * SIZE) - HALF,
-                (piece.y as f32 * SIZE) - HALF,
-            );
-            let max = Vec2::new(
-                (piece.x as f32 * SIZE) + HALF,
-                (piece.y as f32 * SIZE) + HALF,
-            );
-            let piece_boarder =
+    if selection.old == Vec2::NEG_ONE {
+        for piece in pieces.iter() {
+            let center = Vec2::new(piece.x as f32, piece.y as f32) * SIZE;
+            let min = center - HALF_SIZE;
+            let max = center + HALF_SIZE;
+
+            let inside_square =
                 point.x > min.x && point.y > min.y && point.x < max.x && point.y < max.y;
 
-            if piece_boarder && turn_manager.same_color(piece.color) {
+            if inside_square && turn_manager.same_color(piece.color) {
                 selection.old = pos;
                 break;
             }
