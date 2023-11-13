@@ -127,7 +127,92 @@ fn click_input(
                 break;
             }
         }
-    } else if pos != selection.old {
+    } else if pos != selection.old
+        && valid_path(
+            (
+                (selection.old.x / SIZE) as u8,
+                (selection.old.y / SIZE) as u8,
+            ),
+            (
+                (selection.new.x / SIZE) as u8,
+                (selection.new.y / SIZE) as u8,
+            ),
+            pieces,
+        )
+    {
         selection.new = pos;
     }
+}
+
+fn valid_path(from: (u8, u8), to: (u8, u8), pieces: Query<&Piece>) -> bool {
+    return true;
+
+    // NOTE: This code is stolen
+    // let x_diff = (self.x - to.0).abs();
+    // let y_diff = (self.y - to.1).abs();
+    // let same_x = self.x == to.0;
+    // let same_y = self.y == to.1;
+    // let path_empty = is_path_empty((self.x, self.y), to, &pieces);
+
+    // match self.my_type {
+    //     PieceType::King => {
+    //         path_empty
+    //             && ((x_diff == 1 && same_y)
+    //                 || (y_diff == 1 && same_x)
+    //                 || (x_diff == 1 && y_diff == 1))
+    //     }
+    //     PieceType::Queen => {
+    //         path_empty && (x_diff == y_diff || ((same_x && !same_y) || (same_y && !same_x)))
+    //     }
+    //     PieceType::Bishop => path_empty && x_diff == y_diff,
+    //     PieceType::Knight => (x_diff == 2 && y_diff == 1) || (x_diff == 1 && y_diff == 2),
+    //     PieceType::Rook => path_empty && ((same_x && !same_y) || (same_y && !same_x)),
+    //     PieceType::Pawn => {
+    //         let color = piece_color(to, &pieces);
+
+    //         if self.color == PieceColor::White {
+    //             if same_x && path_empty {
+    //                 if self.y == 1 {
+    //                     if y_diff == 2 {
+    //                         if color.is_none() {
+    //                             return true;
+    //                         }
+    //                     }
+    //                 } else {
+    //                     if y_diff == 1 {
+    //                         if color.is_none() {
+    //                             return true;
+    //                         }
+    //                     }
+    //                 }
+    //             } else if to.0 - self.x == 1 && y_diff == 1 {
+    //                 if color == Some(PieceColor::Black) {
+    //                     return true;
+    //                 }
+    //             }
+    //         } else {
+    //             if same_x && path_empty {
+    //                 if self.y == 6 {
+    //                     if y_diff == -2 {
+    //                         if color.is_none() {
+    //                             return true;
+    //                         }
+    //                     }
+    //                 } else {
+    //                     if y_diff == -1 {
+    //                         if color.is_none() {
+    //                             return true;
+    //                         }
+    //                     }
+    //                 }
+    //             } else if to.0 - self.x == -1 && y_diff == 1 {
+    //                 if color == Some(PieceColor::White) {
+    //                     return true;
+    //                 }
+    //             }
+    //         }
+
+    //         false
+    //     }
+    // }
 }

@@ -93,9 +93,6 @@ fn load_sprites(
     }
 }
 
-// TODO: if move not allowed, return
-// TODO: else if path is blocked, return
-
 fn move_pieces(
     mut commands: Commands,
     mut selection: ResMut<Selection>,
@@ -106,8 +103,7 @@ fn move_pieces(
         return;
     }
 
-    let mut check1 = false;
-    let mut check2 = false;
+    // let mut piece_vector = Vec::new();
     let mut attacker: Option<(Mut<'_, Piece>, Mut<'_, Transform>)> = None;
     let mut defender: Option<(Mut<'_, Piece>, Mut<'_, Transform>, Entity)> = None;
 
@@ -115,20 +111,33 @@ fn move_pieces(
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
         if pos == selection.old {
             attacker = Some((piece, transform));
-            check1 = true;
         } else if pos == selection.new {
             defender = Some((piece, transform, id));
-            check2 = true;
         }
 
-        if check1 && check2 {
-            break;
-        }
+        // piece_vector.push(piece);
     }
 
     let Some(attack) = attacker else {
         return;
     };
+
+    // TODO: fill arguments
+    // if attack.0.my_type != PieceType::Knight
+    //     && !path_empty(
+    //         (
+    //             (selection.old.x / SIZE) as u8,
+    //             (selection.old.y / SIZE) as u8,
+    //         ),
+    //         (
+    //             (selection.new.x / SIZE) as u8,
+    //             (selection.new.y / SIZE) as u8,
+    //         ),
+    //         piece_vector,
+    //     )
+    // {
+    //     return;
+    // }
 
     if let Some(defend) = defender {
         if defend.0.color == attack.0.color {
@@ -136,6 +145,12 @@ fn move_pieces(
                 && defend.0.my_type == PieceType::Rook)
                 || (attack.0.my_type == PieceType::Rook && defend.0.my_type == PieceType::King);
             if king_rook {
+                // FIX: Check the following conditions rules
+                // NOTE: 1. Neither the king nor the rook involved in the switch must have moved previously.
+                // NOTE: 2. There should be no pieces between the king and the rook.
+                // NOTE: 3. The king should not be in check.
+                // NOTE: 4. The squares that the king crosses and ends up on should not be under attack.
+
                 move_piece(defend.0, defend.1, selection.old);
                 move_piece(attack.0, attack.1, selection.new);
                 selection.old = Vec2::NEG_ONE;
@@ -162,4 +177,59 @@ fn move_pieces(
 
         transform.translation = Vec3::new(pos.x * SIZE, pos.y * SIZE, ORDER_LAYER);
     }
+}
+
+fn path_empty(from: (u8, u8), to: (u8, u8), pieces: Vec<&Piece>) -> bool {
+    // TODO: Check that there are no pieces in between the two points
+    return true;
+
+    // NOTE: Stolen code
+    //     if begin.0 == end.0 {
+    //         for piece in pieces {
+    //             if piece.x == begin.0
+    //                 && ((piece.y > begin.1 && piece.y < end.1)
+    //                     || (piece.y > end.1 && piece.y < begin.1))
+    //             {
+    //                 return false;
+    //             }
+    //         }
+    //     }
+
+    //     if begin.1 == end.1 {
+    //         for piece in pieces {
+    //             if piece.y == begin.1
+    //                 && ((piece.x > begin.0 && piece.x < end.0)
+    //                     || (piece.x > end.0 && piece.x < begin.0))
+    //             {
+    //                 return false;
+    //             }
+    //         }
+    //     }
+
+    //     let x_diff = (begin.0 - end.0).abs();
+    //     let y_diff = (begin.1 - end.1).abs();
+    //     if x_diff == y_diff {
+    //         for i in 1..x_diff {
+    //             let pos = if begin.0 < end.0 && begin.1 < end.1 {
+    //                 // left bottom - right top
+    //                 (begin.0 + i, begin.1 + i)
+    //             } else if begin.0 < end.0 && begin.1 > end.1 {
+    //                 // left top - right bottom
+    //                 (begin.0 + i, begin.1 - i)
+    //             } else if begin.0 > end.0 && begin.1 < end.1 {
+    //                 // right bottom - left top
+    //                 (begin.0 - i, begin.1 + i)
+    //             } else {
+    //                 // begin.0 > end.0 && begin.1 > end.1
+    //                 // right top - left bottom
+    //                 (begin.0 - i, begin.1 - i)
+    //             };
+
+    //             if piece_color(pos, pieces).is_some() {
+    //                 return false;
+    //             }
+    //         }
+    //     }
+
+    //     true
 }
