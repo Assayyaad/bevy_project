@@ -1,7 +1,6 @@
 use super::*;
 
 const ORDER_LAYER: f32 = 5.0;
-const SCALER: f32 = 2.;
 
 #[derive(Clone, Copy, PartialEq, Debug, Default)]
 pub enum PieceColor {
@@ -84,11 +83,11 @@ fn load_sprites(
             },
             transform: {
                 let pos = Vec3::new(piece.x as f32 * SIZE, piece.y as f32 * SIZE, ORDER_LAYER);
-                let scale = Vec3::new(SCALER, SCALER, 1.);
+                let scale = Vec3::new(SIZE / 16., SIZE / 16., 1.);
 
                 Transform::from_translation(pos).with_scale(scale)
             },
-            ..Default::default()
+            ..default()
         });
     }
 }

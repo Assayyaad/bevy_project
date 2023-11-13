@@ -3,7 +3,7 @@ use bevy_vector_shapes::prelude::*;
 
 use crate::input::Selection;
 
-pub const SIZE: f32 = 50.0;
+pub const SIZE: f32 = 80.0; // NOTE: can we make it relative to the screen height? SIZE = window.height / 13.5
 pub const HALF_SIZE: f32 = SIZE * 0.5;
 pub const MAX: u8 = 8;
 const ORDER_LAYER: f32 = 0.0;
@@ -36,7 +36,7 @@ fn load_sprites(mut commands: Commands, asset_server: Res<AssetServer>) {
                     asset_server.load(black_image_path)
                 },
                 transform: Transform::from_xyz(SIZE * (i as f32), SIZE * (j as f32), ORDER_LAYER)
-                    .with_scale(Vec3::ONE * 3.15),
+                    .with_scale(Vec3::new(SIZE / 16., SIZE / 16., 1.)),
                 ..default()
             });
             choice = !choice;
@@ -84,7 +84,7 @@ fn draw_selected(mut painter: ShapePainter, selection: Res<Selection>) {
     painter.set_translation(pos);
 
     painter.color = Color::ORANGE;
-    painter.circle(SIZE * 0.4);
+    painter.circle(SIZE * 0.5);
 }
 
 //

@@ -52,7 +52,7 @@ fn spawn_turn_text(mut commands: Commands) {
                 align_content: AlignContent::Center,
                 align_items: AlignItems::Center,
 
-                bottom: Val::Percent(80.0),
+                bottom: Val::Percent(90.0),
                 right: Val::Percent(35.0),
                 left: Val::Percent(35.0),
 
