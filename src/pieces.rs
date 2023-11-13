@@ -109,7 +109,7 @@ fn move_pieces(
     let mut check1 = false;
     let mut check2 = false;
     let mut attacker: Option<(Mut<'_, Piece>, Mut<'_, Transform>)> = None;
-    let mut defender: Option<(Mut<'_, Piece>, Entity)> = None;
+    let mut defender: Option<(Mut<'_, Piece>, Mut<'_, Transform>, Entity)> = None;
 
     for (id, piece, transform) in query.iter_mut() {
         let pos = Vec2::new(piece.x as f32, piece.y as f32);
@@ -117,7 +117,7 @@ fn move_pieces(
             attacker = Some((piece, transform));
             check1 = true;
         } else if pos == selection.new {
-            defender = Some((piece, id));
+            defender = Some((piece, transform, id));
             check2 = true;
         }
 
@@ -126,25 +126,40 @@ fn move_pieces(
         }
     }
 
-    let Some(mut attack) = attacker else {
+    let Some(attack) = attacker else {
         return;
     };
 
     if let Some(defend) = defender {
         if defend.0.color == attack.0.color {
+            let king_rook = (attack.0.my_type == PieceType::King
+                && defend.0.my_type == PieceType::Rook)
+                || (attack.0.my_type == PieceType::Rook && defend.0.my_type == PieceType::King);
+            if king_rook {
+                move_piece(defend.0, defend.1, selection.old);
+                move_piece(attack.0, attack.1, selection.new);
+                selection.old = Vec2::NEG_ONE;
+                selection.new = Vec2::NEG_ONE;
+                manager.next_turn();
+                return;
+            }
+
             selection.new = Vec2::NEG_ONE;
             return;
         }
 
-        commands.entity(defend.1).despawn();
+        commands.entity(defend.2).despawn();
     }
 
-    attack.0.x = selection.new.x as u8;
-    attack.0.y = selection.new.y as u8;
-
-    attack.1.translation = Vec3::new(selection.new.x * SIZE, selection.new.y * SIZE, ORDER_LAYER);
-
+    move_piece(attack.0, attack.1, selection.new);
     selection.old = Vec2::NEG_ONE;
     selection.new = Vec2::NEG_ONE;
     manager.next_turn();
+
+    fn move_piece(mut piece: Mut<'_, Piece>, mut transform: Mut<'_, Transform>, pos: Vec2) {
+        piece.x = pos.x as u8;
+        piece.y = pos.y as u8;
+
+        transform.translation = Vec3::new(pos.x * SIZE, pos.y * SIZE, ORDER_LAYER);
+    }
 }
